@@ -11,18 +11,11 @@ export async function POST(req) {
 
   const wh = new Webhook(process.env.SIGNING_SECRET);
   const headerPayload = headers();
-  const svixHeaders = {
-    "svix-id": headerPayload.get("svix-id"),
-    "svix-timestamp": headerPayload.get("svix-timestamp"),
-    "svix-signature": headerPayload.get("svix-signature"),
-  };
-
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
+  const body = await req.text();
 
   let evt;
   try {
-    evt = wh.verify(body, svixHeaders);
+    evt = wh.verify(body, headerPayload);
   } catch (err) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
